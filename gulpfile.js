@@ -16,9 +16,6 @@ const browserSync = require('browser-sync');
 const reload = browserSync.reload;
 const historyApiFallback = require('connect-history-api-fallback')
 
-function hello() {
-  var foo = 1234;
-}
 /*
   Styles Task
 */
@@ -102,7 +99,7 @@ function buildScript(file, watch) {
   return rebundle();
 }
 
-gulp.task('scripts', function() {
+gulp.task('scripts', function () {
   return buildScript('main.js', false); // this will run once because we set watch to false
 });
 
