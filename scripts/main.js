@@ -15,7 +15,7 @@ const App = React.createClass({
   getInitialState() {
     return {
       fishes: {},
-      orders: {},
+      order: {},
     };
   },
   addFish(fish) {
@@ -23,14 +23,29 @@ const App = React.createClass({
     this.state.fishes[`fish-${timeStamp}`] = fish;
     this.setState({ fishes: this.state.fishes });
   },
+  addFishtoOrder(fish) {
+    this.state.order[fish] = this.state.order[fish] += 1 || 1;
+    this.setState({ order: this.state.order });
+  },
+  loadSamples() {
+    this.setState({
+      fishes: require('./sample-fishes'),
+    });
+  },
+  renderFish(key) {
+    return <Fish key={key} index={key} details={this.state.fishes[key]} addFishtoOrder={this.addFishtoOrder} />;
+  },
   render() {
     return (
       <div className="catch-of-the-day">
         <div className="menu">
           <Header tagline="Fresh sea food market" />
+          <ul className="list-of-fishes">
+            {Object.keys(this.state.fishes).map(this.renderFish)}
+          </ul>
         </div>
         <Order />
-        <Inventory addFish={this.addFish} />
+        <Inventory addFish={this.addFish} loadSamples={this.loadSamples} />
       </div>
     );
   },
@@ -38,6 +53,28 @@ const App = React.createClass({
 
 // end of App *******************
 
+const Fish = React.createClass({
+  onButtonOrder() {
+    console.log(`Adding fish ${this.props.index}`);
+    this.props.addFishtoOrder(this.props.index);
+  },
+  render() {
+    const details = this.props.details;
+    const isAvailable = (details.status === 'available');
+    const buttonText = isAvailable ? 'Add to Order' : 'Sold Out!';
+    return (
+      <li className="menu-fish">
+        <img src={details.image} alt={details.name} />
+        <h3 className="fish-name">
+          {details.name}
+          <span className="price">{h.formatPrice(details.price)}</span>
+        </h3>
+        <p>{details.desc}</p>
+        <button disabled={!isAvailable} onClick={this.onButtonOrder}>{buttonText}</button>
+      </li>
+    );
+  },
+});
 // Header ****************
 
 const Header = React.createClass({
@@ -79,6 +116,7 @@ const Inventory = React.createClass({
       <div>
         <p>Inventory</p>
         <AddFishForm addFish={this.props.addFish} />
+        <button onClick={this.props.loadSamples} >Load Samples!</button>
       </div>
     );
   },
@@ -89,8 +127,8 @@ const Inventory = React.createClass({
 const AddFishForm = React.createClass({
   createFish(event) {
     event.preventDefault();
-    // console.log(this.refs.name.value); This works with the constructor object of the component and the refs attributes of the input and not the event
-    // console.log(event.target.name.value); This works with the event target and the name attribute of the input
+   // console.log(this.refs.name.value); This works with the constructor object of the component and the refs attributes of the input and not the event
+   // console.log(event.target.name.value); This works with the event target and the name attribute of the input
 
     const fish = {
       name: this.refs.name.value,
